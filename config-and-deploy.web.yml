@@ -1,0 +1,34 @@
+---
+- name: Configure and deploy website
+  hosts: localhost
+  connection: local
+  become: true
+
+  tasks:
+    - name: Install Nginx, Git and rsync
+      ansible.builtin.apt:
+        name:
+          - nginx
+          - git
+          - rsync
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Clone website from GitHub
+      ansible.builtin.git:
+        repo: https://github.com/nenemustafa/Hellome.git
+        dest: /tmp/Hellome
+        version: HEAD
+
+    - name: Deploy website to Nginx
+      ansible.builtin.copy:
+        src: /tmp/Hellome/heyme
+        dest: /var/www/html/index.html
+        remote_src: yes
+        mode: '0644'
